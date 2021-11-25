@@ -321,7 +321,7 @@ int HCV_Model::solve(){
     initialize();
 
     fstream saida;
-    saida.open("saida.txt", std::ios::out);
+    saida.open("output/saida.txt", std::ios::out);
 
     /**
     * begin time loop
@@ -345,7 +345,7 @@ int HCV_Model::solve(){
         * ODEs
         */
         T = (s - d*T - beta*V*T)*deltaT + T;
-        V = ((1-epsilon_s)*rho*calcIntegral(I,Rp,Rt) - c*V)*deltaT + V;
+        V = ((1-epsilon_s)*rho*calcIntegral(Rp,Rt,I) - c*V)*deltaT + V;
         
         //printf("t = %ld V = %lf T = %lf \n", t,V,T);
         /**
