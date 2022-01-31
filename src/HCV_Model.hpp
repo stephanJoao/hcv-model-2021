@@ -54,9 +54,9 @@ class HCV_Model
         double theta; // taxa de disponibilidade para tradu��o
         double mu_c; // decaimento natural de Rc e Rn
 
-        double epsilon_s; // efetividade da terapia em diminuir ou bloquear a exporta��o de RNA positivo
-        double epsilon_alpha; // efetividade da terapia em diminuir ou bloquear a replica��o de RNA positivo
-        double epsilon_r; // efetividade da terapia em diminuir ou bloquear a replica��o de RNA negativo
+        double epsilon_s;     // Efetividade da terapia em diminuir ou bloquear a exportação de RNA positivo
+        double epsilon_alpha; // Efetividade da terapia em diminuir ou bloquear a replicação de RNA positivo
+        double epsilon_r;     // Efetividade da terapia em diminuir ou bloquear a replica��o de RNA negativo
 
         double kappa_t; // fator para aumentar a degrada��o de RNA positivo dispon�vel para tradu��o
         double kappa_c; // fator para aumentar a degrada��o de RNA positivo e negativo no complexo de replica��o

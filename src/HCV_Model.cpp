@@ -1,8 +1,7 @@
-#include "HCV_Model.hpp"
-
 #include <fstream>
 
-#include "GaussLegendreQuadrature.h"
+#include "HCV_Model.hpp"
+#include "GaussLegendreQuadrature.hpp"
 
 /**
 * Constructor
