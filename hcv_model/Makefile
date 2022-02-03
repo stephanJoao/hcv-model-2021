@@ -42,4 +42,7 @@ objectsFolder:
 clean:
 	@rm -rf ./objects/*.o
 
+run:
+	@./program
+
 .PHONY: all clean

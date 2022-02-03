@@ -12,15 +12,16 @@ class HCV_Model
     // Variables
     private:
 
+        double T;     // Target cells
+        double V;     // Virus
+        double A_alt; // ALT
+        
         double I[buffer][AGE];  // Infected cells
 
         double Rp[buffer][AGE]; // RNA intracelular positivo
         double Rn[buffer][AGE]; // RNA intracelular negativo
         double Rt[buffer][AGE]; // RNA positivo traduzido
 
-        double T;     // Target cells
-        double V;     // Virus
-        double A_alt; // ALT
 
         int simCase;
         int days;
@@ -32,42 +33,53 @@ class HCV_Model
         int vardelta;
         int varrho;
 
-        double  N; //valores iniciais
+        double  N; // Initial values
 
-        double s; // taxa constante de producao de celulas alvo
-        double d; // decaimento natural de celulas alvo
-        double beta; // taxa de infecao
-        double delta; // decaimento de celulas infectadas
-        double rho; // taxa de exporta��o de RNA positivo
-        double c; // taxa de eliminacaoo do virus pelo SI
+        // Target cells
+        double s;     // Target cells production rate
+        double d;     // Target cells natural decay
+        double beta;  // Infection rate (of target cells)
 
-        double alpha; // taxa de replica��o de RNA positivo
-
-        double r; // taxa de replica��o de RNA negativo / complexo de replica��o (Rn)
-
-        double k; // coeficiente da fun��o exponencial de atraso na exporta��o de RNA positivo
-        double tau; // tempo de atraso para a exporta��o de RNA positivo
-        double n; //atraso de delta
-        double Rmax; // n�mero m�ximo de RNA negativo / complexo de replica��o (Rn)
-        double sigma; // taxa de forma��o de complexos de replica��o
-        double mu_t; // decaimento natural de Rt
-        double theta; // taxa de disponibilidade para tradu��o
-        double mu_c; // decaimento natural de Rc e Rn
-
-        double epsilon_s;     // Efetividade da terapia em diminuir ou bloquear a exportação de RNA positivo
-        double epsilon_alpha; // Efetividade da terapia em diminuir ou bloquear a replicação de RNA positivo
-        double epsilon_r;     // Efetividade da terapia em diminuir ou bloquear a replica��o de RNA negativo
-
-        double kappa_t; // fator para aumentar a degrada��o de RNA positivo dispon�vel para tradu��o
-        double kappa_c; // fator para aumentar a degrada��o de RNA positivo e negativo no complexo de replica��o
-
+        // Virus (is coupled to the rest of the model with the integral in its equation)
+        double c; // Virus elimination rate (by the imune system)
+        
+        // Infected cells
+        double delta; // Infected cells decay (should depend on age)
+        
+        // ALT
         double s_alt; //ALT liberado no sangue por fatores externos 
         double c_alt; //ALT removido da circulação
         double alpha_alt; //ALT liberado pelas células infectadas
+        
+        // Intracelular positive-strand RNA
+        double alpha; // Positive-strand RNA replication rate (should depend on age)
+        double rho;   // Positive-strand RNA exportation rate (should depend on age)
+        double mu_p; // Natural decay of positive and negative RNA
+        
+        // Intracelular negative-strand RNA
+        double r; // Negative-strand RNA replication rate //TODO(tem uma dependência?)
+        double Rmax; // Maximum number of negative RNA
 
+        // Translated positive-strand RNA
+        double sigma; // Replication complexes production rate (by translated positive RNA)
+        double mu_t; // Natural decay of translated positive RNA
+
+
+        double k; // coeficiente da fun��o exponencial de atraso na exporta��o de RNA positivo
+        double tau; // Delay time for positive RNA exportation
+        double n; //atraso de delta
+        double theta; // taxa de disponibilidade para tradu��o
+
+        // Therapy 
+        double epsilon_s;     // Therapy effectiveness in reducing the exportation of positive RNA
+        double epsilon_alpha; // Therapy effectiveness in reducing the replication of positive RNA
+        double epsilon_r;     // Therapy effectiveness in reducing the replication of negative RNA
+
+        double kappa_t; // Factor that increases positive RNA (ready for translation) degradation
+        double kappa_c; // Factor that increases positive and negative RNA (translation complex) degradation
         
         int saveFiles;
-        char *dir;
+        char* dir;
         FILE* dataInfected;
         FILE* dataVirus;
         FILE* dataTarget;
@@ -86,8 +98,8 @@ class HCV_Model
 
         void initialize();
         double calcIntegral(double vec1[][AGE], double vec2[][AGE], double vec3[][AGE]);
-        double calcIntegral1(double vec1[][AGE]);
-        double calcIntegral2(double a, double b, double vec1[][AGE], double vec2[][AGE], double delta, double rho, double deltaA);
+        double calcIntegral(double vec1[][AGE]);
+        double calcIntegral(double a, double b, double vec1[][AGE], double vec2[][AGE], double delta, double rho, double deltaA);
         void update(double vec[][AGE]);
 
     public:

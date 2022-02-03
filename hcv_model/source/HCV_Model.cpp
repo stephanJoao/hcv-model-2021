@@ -42,7 +42,7 @@ void HCV_Model::initialize()
     delta = atof(aux_string.c_str());
     
     getline(param, aux_string, ',');
-    mu_c = atof(aux_string.c_str());
+    mu_p = atof(aux_string.c_str());
 
     getline(param, aux_string, ',');
     rho = atof(aux_string.c_str());
@@ -110,7 +110,7 @@ void HCV_Model::initialize()
     n     = 1.00;
     k     = 0.80;
     mu_t  = 0.89; 
-    // mu_c  = 2.55; 
+    // mu_p  = 2.55; 
     // sigma = 1.30;
     // theta = 1.20;
     /**
@@ -122,8 +122,8 @@ void HCV_Model::initialize()
     kappa_t       = 1.00;
     kappa_c       = 1.00;
     
-    if ((sigma + rho + mu_c - (sigma * theta) / (theta + rho + mu_t) <= 0) || 
-            (alpha*r - (sigma + rho + mu_c - (sigma * theta) / (theta + rho + mu_t)) * mu_c <= 0))
+    if ((sigma + rho + mu_p - (sigma * theta) / (theta + rho + mu_t) <= 0) || 
+            (alpha*r - (sigma + rho + mu_p - (sigma * theta) / (theta + rho + mu_t)) * mu_p <= 0))
     {
         sigma = 1.30;
         theta = 1.20;
@@ -165,11 +165,11 @@ void HCV_Model::initialize()
             }
         }else rho1 = rho;
         Rn[0][a] = (r*Rp[0][a-1] - r*Rp[0][a-1]*(Rn[0][a-1]/Rmax) -
-                mu_c*Rn[0][a-1])*deltaA + Rn[0][a-1];
+                mu_p*Rn[0][a-1])*deltaA + Rn[0][a-1];
 
         Rp[0][a] = (alpha*Rn[0][a-1] + sigma*Rt[0][a-1] -
                 theta*Rp[0][a-1]- rho1*Rp[0][a-1] -
-                mu_c*Rp[0][a-1])*deltaA + Rp[0][a-1];
+                mu_p*Rp[0][a-1])*deltaA + Rp[0][a-1];
 
         Rt[0][a] = (theta*Rp[0][a-1] - sigma*Rt[0][a-1] -
                 rho1*Rt[0][a-1] - mu_t*Rt[0][a-1])*deltaA + Rt[0][a-1];
@@ -179,7 +179,7 @@ void HCV_Model::initialize()
         //printf("a = %d Rt = %.4lf Rp = %.4lf Rn = %.4lf \n", a, Rt[0][a], Rp[0][a], Rn[0][a]);
     }
     
-    N = calcIntegral2(0.0, AGE, Rp, Rt, delta, rho, deltaA); 
+    N = calcIntegral(0.0, AGE, Rp, Rt, delta, rho, deltaA); 
     T = c / (beta * N);                                       
     V = V0; //fixar baseado na outra DE
     I[0][0] = beta * T * V;
@@ -217,7 +217,7 @@ double HCV_Model::calcIntegral(double vec1[][AGE], double vec2[][AGE],double vec
     return sum / (2.0 * AGE);
 }
 
-double HCV_Model::calcIntegral1(double vec1[][AGE])
+double HCV_Model::calcIntegral(double vec1[][AGE])
 { 
     //MATHEUS integral do ALT
     int a;
@@ -228,7 +228,7 @@ double HCV_Model::calcIntegral1(double vec1[][AGE])
     return sum/(2.0*AGE);
 }
 
-double HCV_Model::calcIntegral2(double a, double b, double vec1[][AGE], double vec2[][AGE], double delta, double rho, double deltaA)
+double HCV_Model::calcIntegral(double a, double b, double vec1[][AGE], double vec2[][AGE], double delta, double rho, double deltaA)
 {
     Rosetta::GaussLegendreQuadrature<5> gl5;
     //std::cout << std::setprecision(6);
@@ -248,8 +248,9 @@ int HCV_Model::solve()
     // Set initial conditions
     initialize();
 
-    std::fstream saida;
-    saida.open("output/saida.txt", std::ios::out);
+    // Opens output file
+    std::fstream output_file;
+    output_file.open("output/saida.txt", std::ios::out);
 
     /**
     * Begin time loop
@@ -257,34 +258,39 @@ int HCV_Model::solve()
     do {
         // if (t == 0) cout << "Calculating...\n";
 
+        //TODO Dá warning de "not used"
         int value = ((int)iterPerDay * days) / points;
         float time_save = (float)t / (float)iterPerDay;
+        
         if(V < 0){
-            V = -1*V;
+            V = -1 * V;
         }
-        if(true){
-            // cout << "Saving files : iteration ..."<< time_save << "\n";
-            saida << time_save << "," << V << std::endl;
-        }
+        
+        // Saving data
+        output_file << time_save << "," << V << std::endl;
         
         /**
         * ODEs
         */
-        T = (s - d * T - beta * V * T) * deltaT + T;
-        V = ((1 - epsilon_s) * rho * calcIntegral(I,Rp,Rt) - c * V) * deltaT + V;
-        A_alt = (alpha_alt * delta * calcIntegral1(I) - c_alt * A_alt) * deltaT + A_alt; // MATHEUS linha 100. delta da linha 70
+        //TODO verificar se tá certo os parenteses com a Bárbara p.74 da tese
+        T = (s - d * T - beta * V * T) 
+                * deltaT + T;
+        V = ((1 - epsilon_s) * rho * calcIntegral(I,Rp,Rt) - c * V) 
+                * deltaT + V;
+        A_alt = (alpha_alt * delta * calcIntegral(I) - c_alt * A_alt) 
+                * deltaT + A_alt; // MATHEUS linha 100. delta da linha 70
         
         //printf("t = %ld V = %lf T = %lf \n", t,V,T);
         
         /**
         * Begin age loop
         */
-        double rho1;
-        double delta1;
+        double rho_func;
+        double delta_func;
         if(varrho)
-            rho1 = 0.0;
+            rho_func = 0.0;
         else
-            rho1 = rho;
+            rho_func = rho;
         a = 0;
 
         Rp[1][a]  = 0.0;
@@ -293,37 +299,44 @@ int HCV_Model::solve()
         I[1][a]   = beta * V *T;
 
         if(vardelta)
-            delta1 = 0.01;
+            delta_func = 0.01;
         else
-            delta1 = delta;
+            delta_func = delta;
 
         for(a = 1; a < AGE-1; a++){
             if(varrho){
                 if(((double)a * deltaA) < tau){
-                    rho1 = 0;
+                    rho_func = 0;
                 } else {
-                    rho1 = (1 - exp(-k * (((double)a * deltaA) - tau))) * rho;
+                    rho_func = (1 - exp(-k * (((double)a * deltaA) - tau))) * rho;
                 }
             } else {
-                rho1 = rho;
+                rho_func = rho;
             }
             
             if(vardelta)
-                delta1 = delta * (1 - exp(-k * (a * deltaA)));
+                delta_func = delta * (1 - exp(-k * (a * deltaA)));
             else
-                delta1 = delta;
+                delta_func = delta;
 
             
-            I[1][a] = (-delta1 * I[0][a] - (I[0][a] - I[0][a - 1]) / (deltaA)) * deltaT + I[0][a];
+            //TODO Termos que não achei, será que estão em outros artigos que não a tese?
+            I[1][a]  = (-delta_func * I[0][a] 
+                        - (I[0][a] - I[0][a - 1]) / (deltaA)) //TODO Esse termo? Não entendi, mas tem em todos, é algo da integral acho
+                        * deltaT + I[0][a];
 
-		    Rn[1][a] = ((1 - epsilon_r) * r * Rp[0][a] - (1 - epsilon_r) * r * Rp[0][a] * (Rn[0][a] / Rmax) 
-                            - kappa_c * mu_c * Rn[0][a] - (Rn[0][a] - Rn[0][a - 1]) / (deltaA)) * deltaT + Rn[0][a];
+		    Rn[1][a] = ((1 - epsilon_r) * r * Rp[0][a] - (1 - epsilon_r) * r * Rp[0][a] * (Rn[0][a] / Rmax) - kappa_c * mu_p * Rn[0][a] 
+                        - (Rn[0][a] - Rn[0][a - 1]) / (deltaA)) 
+                        * deltaT + Rn[0][a];
 
 		    Rp[1][a] = ((1 - epsilon_alpha) * alpha * Rn[0][a] + sigma * Rt[0][a] - theta * Rp[0][a] - (1 - epsilon_s)
-                            * rho1 * Rp[0][a] - kappa_c * mu_c * Rp[0][a] - (Rp[0][a] - Rp[0][a - 1]) / (deltaA)) * deltaT + Rp[0][a];
+                        * rho_func * Rp[0][a] - kappa_c * mu_p * Rp[0][a] 
+                        - (Rp[0][a] - Rp[0][a - 1]) / (deltaA)) 
+                        * deltaT + Rp[0][a];
 
-            Rt[1][a] = (theta * Rp[0][a] - sigma * Rt[0][a] - (1 - epsilon_s) * rho1 * Rt[0][a] - kappa_t 
-                            * mu_t * Rt[0][a] - ((Rt[0][a] - Rt[0][a - 1]) / (deltaA))) * deltaT + Rt[0][a];
+            Rt[1][a] = (theta * Rp[0][a] - sigma * Rt[0][a] - (1 - epsilon_s) * rho_func * Rt[0][a] - kappa_t 
+                        * mu_t * Rt[0][a] - ((Rt[0][a] - Rt[0][a - 1]) / (deltaA))) 
+                        * deltaT + Rt[0][a];
 	    }
 
 	    update(I);
@@ -336,7 +349,7 @@ int HCV_Model::solve()
     } 
     while(t < (iterPerDay * days));
 
-    saida.close();
+    output_file.close();
 
     return 0;
  }
