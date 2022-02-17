@@ -18,9 +18,9 @@ class HCV_Model
         
         double I[buffer][AGE];  // Infected cells
 
-        double Rp[buffer][AGE]; // RNA intracelular positivo
-        double Rn[buffer][AGE]; // RNA intracelular negativo
-        double Rt[buffer][AGE]; // RNA positivo traduzido
+        double Rp[buffer][AGE]; // Positive-strand intracellular RNA 
+        double Rn[buffer][AGE]; // Negative-strand intracellular RNA 
+        double Rt[buffer][AGE]; // Positive-strand translated RNA 
 
 
         int simCase;
@@ -51,24 +51,26 @@ class HCV_Model
         double c_alt; //ALT removido da circulação
         double alpha_alt; //ALT liberado pelas células infectadas
         
-        // Intracelular positive-strand RNA
+        // Intracellular positive-strand RNA
         double alpha; // Positive-strand RNA replication rate (should depend on age)
-        double rho;   // Positive-strand RNA exportation rate (should depend on age)
-        double mu_p; // Natural decay of positive and negative RNA
+        double rho;   // Positive-strand RNA exportation rate (is delayed according to tau variable)
+        double mu_p;  // Natural decay of positive and negative RNA
         
-        // Intracelular negative-strand RNA
-        double r; // Negative-strand RNA replication rate //TODO(tem uma dependência?)
+        // Intracellular negative-strand RNA
+        double r;    // Negative-strand RNA replication rate
         double Rmax; // Maximum number of negative RNA
 
         // Translated positive-strand RNA
+        double theta; // Translation rate
         double sigma; // Replication complexes production rate (by translated positive RNA)
-        double mu_t; // Natural decay of translated positive RNA
+        double mu_t;  // Natural decay of translated positive RNA
 
-
-        double k; // coeficiente da fun��o exponencial de atraso na exporta��o de RNA positivo
+        // Exportation delay
         double tau; // Delay time for positive RNA exportation
+        double k; // Exponential function coefficient in exportation delay
+        
+        //TODO tentaram atrasar delta, verificar se ele varia no .cpp
         double n; //atraso de delta
-        double theta; // taxa de disponibilidade para tradu��o
 
         // Therapy 
         double epsilon_s;     // Therapy effectiveness in reducing the exportation of positive RNA
@@ -77,35 +79,24 @@ class HCV_Model
 
         double kappa_t; // Factor that increases positive RNA (ready for translation) degradation
         double kappa_c; // Factor that increases positive and negative RNA (translation complex) degradation
-        
-        int saveFiles;
-        char* dir;
-        FILE* dataInfected;
-        FILE* dataVirus;
-        FILE* dataTarget;
-        FILE* dataRNA_Positivo;
-        FILE* dataRNA_Negativo;
-        FILE* dataRNA_Traduzido;
-        FILE* datadelta;
-        FILE* datarho;
 
-        std::string Header();
-        std::string Footer(long int t);
-        int checkFile(FILE* theFile);
+        std::string parameters_file;
         
     // Methods
     private:
 
         void initialize();
+        
         double calcIntegral(double vec1[][AGE], double vec2[][AGE], double vec3[][AGE]);
         double calcIntegral(double vec1[][AGE]);
         double calcIntegral(double a, double b, double vec1[][AGE], double vec2[][AGE], double delta, double rho, double deltaA);
+        
         void update(double vec[][AGE]);
 
     public:
         
-        HCV_Model();
-        int solve();
+        HCV_Model(std::string parameters_file);
+        void solve();
 
 };
 

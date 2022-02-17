@@ -6,9 +6,9 @@
 /**
 * Constructor
 */
-HCV_Model::HCV_Model()
+HCV_Model::HCV_Model(std::string parameters_file)
 {
-
+    this->parameters_file = parameters_file;
 }
 
 /**
@@ -17,7 +17,7 @@ HCV_Model::HCV_Model()
 void HCV_Model::initialize()
 {
     std::fstream param;
-    param.open("input/parametros_DE.txt");
+    param.open(parameters_file.c_str());
     std::string aux_string;
 
     getline(param, aux_string, ',');
@@ -221,17 +221,16 @@ double HCV_Model::calcIntegral(double vec1[][AGE])
 { 
     //MATHEUS integral do ALT
     int a;
-    double sum=0.0;
+    double sum = 0.0;
     for(a = 0; a < AGE; a++){
         sum += vec1[0][a];
     }
-    return sum/(2.0*AGE);
+    return sum / (2.0*AGE);
 }
 
 double HCV_Model::calcIntegral(double a, double b, double vec1[][AGE], double vec2[][AGE], double delta, double rho, double deltaA)
 {
     Rosetta::GaussLegendreQuadrature<5> gl5;
-    //std::cout << std::setprecision(6);
     std::setprecision(6);
     //gl5.print_roots_and_weights(std::cout);
     return gl5.integrate(a, b, vec1, vec2, Rosetta::RosettaExp, delta, rho, deltaA);
@@ -240,7 +239,7 @@ double HCV_Model::calcIntegral(double a, double b, double vec1[][AGE], double ve
 /**
  * Solve model equations
  */
-int HCV_Model::solve()
+void HCV_Model::solve()
 {
     long int t = 0;
     long int a = 0;
@@ -256,10 +255,9 @@ int HCV_Model::solve()
     * Begin time loop
     */
     do {
-        // if (t == 0) cout << "Calculating...\n";
 
-        //TODO Dá warning de "not used"
-        int value = ((int)iterPerDay * days) / points;
+        //TODO Dá warning de "not used" / pode tirar eu acho
+        // int value = ((int)iterPerDay * days) / points;
         float time_save = (float)t / (float)iterPerDay;
         
         if(V < 0){
@@ -267,12 +265,13 @@ int HCV_Model::solve()
         }
         
         // Saving data
+        //TODO ALT na próxima coluna ou novo arquivo/ verificar no plotDados como que plota os dados
         output_file << time_save << "," << V << std::endl;
         
         /**
         * ODEs
         */
-        //TODO verificar se tá certo os parenteses com a Bárbara p.74 da tese
+        //TODO verificar se tá certo os parenteses com a Bárbara p.74 da tese CERTO
         T = (s - d * T - beta * V * T) 
                 * deltaT + T;
         V = ((1 - epsilon_s) * rho * calcIntegral(I,Rp,Rt) - c * V) 
@@ -291,6 +290,7 @@ int HCV_Model::solve()
             rho_func = 0.0;
         else
             rho_func = rho;
+        
         a = 0;
 
         Rp[1][a]  = 0.0;
@@ -318,11 +318,10 @@ int HCV_Model::solve()
                 delta_func = delta * (1 - exp(-k * (a * deltaA)));
             else
                 delta_func = delta;
-
             
-            //TODO Termos que não achei, será que estão em outros artigos que não a tese?
+        
             I[1][a]  = (-delta_func * I[0][a] 
-                        - (I[0][a] - I[0][a - 1]) / (deltaA)) //TODO Esse termo? Não entendi, mas tem em todos, é algo da integral acho
+                        - (I[0][a] - I[0][a - 1]) / (deltaA)) //TODO Diferenças finitas
                         * deltaT + I[0][a];
 
 		    Rn[1][a] = ((1 - epsilon_r) * r * Rp[0][a] - (1 - epsilon_r) * r * Rp[0][a] * (Rn[0][a] / Rmax) - kappa_c * mu_p * Rn[0][a] 
@@ -351,5 +350,5 @@ int HCV_Model::solve()
 
     output_file.close();
 
-    return 0;
+    return;
  }
