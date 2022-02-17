@@ -60,8 +60,7 @@ if __name__ == "__main__":
         print(pat_cont, " Patient")
         saida.writelines(str(pat_name[pat_cont-1]) + " Patient\n\n")
         tic = time.perf_counter()
-        sol_pat = differential_evolution(cost_func, bounds, args=(
-            pat, 10**pat[0], pat_cont-1, t_exp), maxiter=maxiter, popsize=popsize, mutation=mutate, recombination=recombination)#, tol=0.1)
+        sol_pat = differential_evolution(cost_func, bounds, args=(pat, 10**pat[0], pat_cont-1, t_exp), maxiter=maxiter, popsize=popsize, mutation=mutate, recombination=recombination)#, tol=0.1)
         toc = time.perf_counter()
         # sol_pat.x => parametros--- sol_pat.fun => custo/ retorno da cost.py
         saida.writelines(f"Tempo de execução: {toc - tic:0.4f} segundos")

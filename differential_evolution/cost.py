@@ -19,7 +19,7 @@ def viralmodelfit(poi, exp, V0, pat_cont, t_exp):
     sigma = poi[9]
     c = poi[10]
 
-    with open('parametros_DE.txt', 'w') as filep:
+    with open('../parametros_DE.txt', 'w') as filep:
         filep.write(str(V0)+","+str(epsilon_r)+","+str(epsilon_alpha)+","+str(epsilon_s)+
         ","+str(alpha)+","+str(r)+","+str(delta)+
         ","+str(mu_c)+","+str(rho)+","+str(theta)+
