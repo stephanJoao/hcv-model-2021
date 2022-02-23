@@ -80,7 +80,8 @@ class HCV_Model
         double kappa_t; // Factor that increases positive RNA (ready for translation) degradation
         double kappa_c; // Factor that increases positive and negative RNA (translation complex) degradation
 
-        std::string parameters_file;
+        std::string input;
+        std::string output;
         
     // Methods
     private:
@@ -95,7 +96,7 @@ class HCV_Model
 
     public:
         
-        HCV_Model(std::string parameters_file);
+        HCV_Model(std::string input, std::string output);
         void solve();
 
 };

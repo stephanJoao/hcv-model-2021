@@ -6,9 +6,10 @@
 /**
 * Constructor
 */
-HCV_Model::HCV_Model(std::string parameters_file)
+HCV_Model::HCV_Model(std::string input, std::string output)
 {
-    this->parameters_file = parameters_file;
+    this->input = input;
+    this->output = output;
 }
 
 /**
@@ -16,47 +17,50 @@ HCV_Model::HCV_Model(std::string parameters_file)
 */
 void HCV_Model::initialize()
 {
-    std::fstream param;
-    param.open(parameters_file.c_str());
+    std::cout << "Reading from \"" << input << "\"" << std::endl;
+    
+    std::ifstream parameters_file;
+    parameters_file.open(input.c_str());
+    
     std::string aux_string;
 
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     double V0 = atof(aux_string.c_str());
 
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     epsilon_r = atof(aux_string.c_str());
     
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     epsilon_alpha = atof(aux_string.c_str());
     
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     epsilon_s = atof(aux_string.c_str());
 
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     alpha = atof(aux_string.c_str());
 
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     r = atof(aux_string.c_str());
         
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     delta = atof(aux_string.c_str());
     
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     mu_p = atof(aux_string.c_str());
 
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     rho = atof(aux_string.c_str());
     
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     theta = atof(aux_string.c_str());
     
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     sigma = atof(aux_string.c_str());
 
-    getline(param, aux_string, ',');
+    getline(parameters_file, aux_string, ',');
     c = atof(aux_string.c_str());
 
-    param.close();
+    parameters_file.close();
 
     s_alt= 1.0;
     c_alt = 1.0;
@@ -248,8 +252,10 @@ void HCV_Model::solve()
     initialize();
 
     // Opens output file
-    std::fstream output_file;
-    output_file.open("output/saida.txt", std::ios::out);
+    std::ofstream output_file;
+    output_file.open(output.c_str());
+
+    std::cout << "Writing in \"" << output << "\"" << std::endl;
 
     /**
     * Begin time loop

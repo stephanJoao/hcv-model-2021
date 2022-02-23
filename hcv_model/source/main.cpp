@@ -6,11 +6,15 @@
 using namespace std;
 
 int main()
-{
-  	HCV_Model* model = new HCV_Model("../diferential_evolution/output/parametros_DE.txt");
-  	
-	char cwd[1024];
+{  	
+	char cwd[1024];	
   	getcwd(cwd, sizeof(cwd));
+  	
+	string dir(cwd);
+	string input = dir + "/input/parametros_DE.txt";
+	string output = dir + "/output/saida.txt";
+
+	HCV_Model* model = new HCV_Model(input, output);
   	
 	model->solve();
 	return 0;
