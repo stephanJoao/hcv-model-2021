@@ -33,6 +33,10 @@ program
 *.out
 *.app
 
+# Output
+*.txt
+*.png
+
 ### VisualStudioCode ###
 .vscode
 .vscode/*
@@ -53,5 +57,3 @@ program
 # Support for Project snippet scope
 !.vscode/*.code-snippets
 
-# Output
-*.txt
