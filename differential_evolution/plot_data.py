@@ -120,6 +120,7 @@ def plot_data_patient(dir_exp_data, dir_de_params, dir_model_input, dir_model_ou
 	# plt.show()
 	plt.clf()
 
+from cost import viralmodelfit
 
 def main():
       
@@ -133,17 +134,22 @@ def main():
 	dir_exp_data = "differential_evolution/data/experimentalData.csv"
 
 	# Directory of differential evolution parameters
-	dir_de_params = "differential_evolution/output/DE_parameters.csv"
+	dir_de_params = "differential_evolution/output/DEs_parameters.csv"
 
 	# Directory of model's input
-	dir_model_input = "hcv_model/input/parametros_DE.txt"
+	dir_model_input = "hcv_model/input/DE_parameters.txt"
 
 	# Directory of model's output
-	dir_model_output = "hcv_model/output/saida.txt"
+	dir_model_output = "hcv_model/output/solution.txt"
 
 	# Directory where images will be saved
 	dir_images = "differential_evolution/output/images/"
 
+	# #####* TESTE
+	# patients = patients_names(dir_exp_data)
+	# exp_data, exp_data_time = experimental_data(dir_exp_data, patients[2])
+	# print(viralmodelfit(de_parameters(dir_de_params, patients[2]), exp_data, exp_data_time))
+	
 	# Program
 	patients = patients_names(dir_exp_data)
 
