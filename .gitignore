@@ -36,6 +36,7 @@ program
 # Output
 *.txt
 *.png
+*.pyc
 
 ### VisualStudioCode ###
 .vscode
