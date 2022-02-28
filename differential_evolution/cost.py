@@ -1,56 +1,74 @@
 import numpy as np 
-from scipy.spatial import distance
-import matplotlib.pyplot as plt
 import os
-from scipy.interpolate import InterpolatedUnivariateSpline
+import matplotlib.pyplot as plt
+from scipy.spatial import distance
 
-np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
+import utils
+
 #recebe como parametro os parametros estocasticos, individuos, e os valores experimentais
-def viralmodelfit(poi, exp, V0, pat_cont, t_exp):
-    epsilon_r = poi[0]
-    epsilon_alpha = poi[1]
-    epsilon_s = poi[2]
-    alpha = poi[3]
-    r = poi[4]
-    delta = poi[5]
-    mu_c = poi[6]
-    rho = poi[7]
-    theta = poi[8]
-    sigma = poi[9]
-    c = poi[10]
+def model_cost(de_params, exp_time, exp_viral_load):
+	"""
+	Calculates the cost of a model according to certain parameters.
+	Arguments:
+		de_params: the parameters for executing the model
+		exp_time: the experimental viral load related time
+		exp_viral_load: the experimental viral load
+	Returns:
+		dist: the summed distance of experimental points to the model representing the cost of the model
+	"""
 
-    with open('../parametros_DE.txt', 'w') as filep:
-        filep.write(str(V0)+","+str(epsilon_r)+","+str(epsilon_alpha)+","+str(epsilon_s)+
-        ","+str(alpha)+","+str(r)+","+str(delta)+
-        ","+str(mu_c)+","+str(rho)+","+str(theta)+
-        ","+str(sigma)+","+str(c))
-    #os.system("make clean")
-    #os.system("make")
-    os.system("make run")#Executa o modelo C++
-    tempoPt = np.empty(0)
-    V = np.empty(0)
-    V_log = np.empty(0)
-    with open("saida.txt", 'r') as f:
-        lista = [line.split(',')  for line in f]
-        for linha in lista:
-            tempoPt = np.append(tempoPt, float(linha[0]))
-            V = np.append(V, float(linha[1]))
-    try:
-      # Passa para a base log o resultado
-      V_log = np.log10(V)
-      V_pts = []
-      for t in t_exp[pat_cont]:
-        V_pts.append(V_log[int(t*100+1)])
-      #ius = InterpolatedUnivariateSpline(t_exp[pat_cont], exp)
-      #yi = ius(tempoPt)
-      #plt.plot(tempoPt, yi, '--r', label='polinomio')
-      
-      # dst = distance.euclidean(V_log, yi) Fica muito ruim
-      plt.plot(tempoPt, V_log, '-g', label='Modelo')
-      # plt.plot(t_exp[pat_cont], V_pts, '^g') Prova de que esta pegando os pontos certos
-      plt.plot(t_exp[pat_cont], exp, 'or', label='dados experimentais')
-      # plt.show()
-      dst = distance.euclidean(V_pts, exp)/len(V_pts)
-    except:
-      dst = 1000
-    return dst
+	# Gets parameters of the model (not the most efficient/elegant way, but its more understandable)
+	epsilon_r, epsilon_alpha, epsilon_s, alpha,	r, delta, mu_c,	rho, theta, sigma, c = de_params
+
+	with open(utils.dir_model_input, 'w') as params_file:
+		params_file.write(str(10**exp_viral_load[0]) + "," + str(epsilon_r) + "," + str(epsilon_alpha) + "," + str(epsilon_s) + "," + str(alpha) + "," + str(r) + "," + str(delta) + "," + str(mu_c) + "," + str(rho) + "," + str(theta) + "," + str(sigma) + "," + str(c))
+	
+	# Execute the model with the parameters
+	print("=========== Running C++ model ===========")
+	directory = "hcv_model/"
+	os.system("make clean -C " + directory)
+	os.system("make -C " + directory)
+	os.system("make run -C " + directory)
+	print("=========================================")
+	
+	# Gets data with the solved model
+	model_time, model_viral_load = utils.reads_model_data()
+		
+	# Selects those points in the model with nearest time to those in the experimental data
+	model_selected = np.empty(0)
+	for i in exp_time:
+		try:
+			model_selected = np.append(model_selected, model_viral_load[int(i * (10**2))])
+		except:
+			model_selected = np.append(model_selected, model_viral_load[len(model_viral_load) - 1]) # Gets last in the model
+
+	# Plots data and model with selected points
+	plt.plot(exp_time, model_selected, 'og', label='Model points selected')
+	plt.plot(exp_time, exp_viral_load, 'or', label="Experimental data")
+	plt.plot(model_time, model_viral_load, '-b', label="Results C++ model")
+	plt.title("Visualization of cost function")
+	plt.legend()
+	plt.savefig(utils.dir_images + "test.png", dpi=300)
+	# plt.show()
+	plt.clf()
+
+	# Calculates the cost of the model
+	try:
+		dist = 0
+		for i in range(0, len(exp_time)):
+			dist = dist + distance.euclidean([exp_time[i], model_selected[i]], [exp_time[i], exp_viral_load[i]])
+	except:
+		dist = 100
+
+	return dist
+
+if __name__ == "__main__":
+	patients = utils.reads_patients_names()
+	
+	for p in patients:
+			exp_time, exp_viral_load = utils.reads_experimental_data(p)
+			de_params = utils.reads_de_parameters(p)
+
+			cost = model_cost(de_params, exp_time, exp_viral_load) 
+
+			print("Cost of patient " + p + " = " + str(cost) + "\n")

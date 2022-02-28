@@ -11,8 +11,8 @@ int main()
   	getcwd(cwd, sizeof(cwd));
   	
 	string dir(cwd);
-	string input = dir + "/input/parametros_DE.txt";
-	string output = dir + "/output/saida.txt";
+	string input = dir + "/input/DE_parameters.txt";
+	string output = dir + "/output/solution.txt";
 
 	HCV_Model* model = new HCV_Model(input, output);
   	

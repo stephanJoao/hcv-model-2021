@@ -1,5 +1,3 @@
-# --- IMPORT DEPENDENCIES ------------------------------------------------------+
-
 import random
 import numpy as np
 from depend.cost import viralmodelfit
@@ -7,10 +5,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import differential_evolution, NonlinearConstraint
 import os
 import time
-# --- MAIN ---------------------------------------------------------------------+
 
 
-# --- CONSTANTS ----------------------------------------------------------------+
 
 cost_func = viralmodelfit                                  #Cost function
 bounds = [(0.1,0.99),(0.1,0.99),(0.1,0.99),(20,60),(0.1,10),(0.01,2),(0.1,2),(1,15), (1,2), (1,2), (10,25)] 
@@ -40,7 +36,6 @@ pat_name = []
 pat_name.append("PATB16")
 pat_name.append("PATB10")
 pat_name.append("PATC14")
-# --- RUN ----------------------------------------------------------------------+
 
 if __name__ == "__main__":
     
@@ -88,4 +83,3 @@ if __name__ == "__main__":
         saida.close()
 
     
-# --- END ----------------------------------------------------------------------+

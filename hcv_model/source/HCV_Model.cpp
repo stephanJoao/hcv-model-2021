@@ -254,6 +254,7 @@ void HCV_Model::solve()
     // Opens output file
     std::ofstream output_file;
     output_file.open(output.c_str());
+    output_file << "time,viral_load" << std::endl;
 
     std::cout << "Writing in \"" << output << "\"" << std::endl;
 
