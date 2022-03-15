@@ -63,6 +63,7 @@ def model_cost(de_params, exp_time, exp_viral_load):
 	return dist
 
 if __name__ == "__main__":
+	
 	patients = utils.reads_patients_names()
 	
 	for p in patients:

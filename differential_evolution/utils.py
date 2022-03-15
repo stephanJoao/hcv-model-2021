@@ -104,7 +104,7 @@ def reads_model_data():
 
 	return t, v
 
-def plot_experiment_patient(patient):
+def plot_experiment_patient(patient, de_parameters = None):
 	"""
 	Plots the solved model with the experimental data.
 	Arguments:
@@ -113,7 +113,10 @@ def plot_experiment_patient(patient):
 
 	# Reads all necessary data
 	exp_time, exp_viral_load = reads_experimental_data(patient)
-	de_params = reads_de_parameters(patient)
+	if de_parameters == None:
+		de_params = reads_de_parameters(patient)
+	else:
+		de_params = de_parameters
 
 	# Writes parameters on file for model solver
 	epsilon_r, epsilon_alpha, epsilon_s, alpha, r, delta, mu_c, rho, theta, sigma, c = de_params
@@ -144,6 +147,7 @@ def plot_experiment_patient(patient):
 	plt.clf()
 
 if __name__ == "__main__":      
+	
 	# Creation of necessary directories
 	if not os.path.isdir("differential_evolution/output"): #TODO Esse vai pra differential evolution quando eu fizer
 		os.system("mkdir differential_evolution/output")
