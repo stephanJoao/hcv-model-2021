@@ -148,11 +148,9 @@ def plot_experiment_patient(patient, de_parameters = None):
 
 if __name__ == "__main__":      
 	
-	# Creation of necessary directories
-	if not os.path.isdir("differential_evolution/output"): #TODO Esse vai pra differential evolution quando eu fizer
-		os.system("mkdir differential_evolution/output")
-	if not os.path.isdir("differential_evolution/output/images"):
-		os.system("mkdir differential_evolution/output/images")	
+	# Creation of necessary directory
+	if not os.path.isdir(dir_images):
+		os.system("mkdir" + dir_images)	
 
 	# #####* TESTE
 	# patients = patients_names(dir_exp_data)

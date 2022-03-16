@@ -6,7 +6,7 @@ from scipy.spatial import distance
 import utils
 
 #recebe como parametro os parametros estocasticos, individuos, e os valores experimentais
-def model_cost(de_params, exp_time, exp_viral_load):
+def model_cost(de_params, exp_time, exp_viral_load, plot = False):
 	"""
 	Calculates the cost of a model according to certain parameters.
 	Arguments:
@@ -42,15 +42,16 @@ def model_cost(de_params, exp_time, exp_viral_load):
 		except:
 			model_selected = np.append(model_selected, model_viral_load[len(model_viral_load) - 1]) # Gets last in the model
 
-	# Plots data and model with selected points
-	plt.plot(exp_time, model_selected, 'og', label='Model points selected')
-	plt.plot(exp_time, exp_viral_load, 'or', label="Experimental data")
-	plt.plot(model_time, model_viral_load, '-b', label="Results C++ model")
-	plt.title("Visualization of cost function")
-	plt.legend()
-	plt.savefig(utils.dir_images + "test.png", dpi=300)
-	# plt.show()
-	plt.clf()
+	if plot:
+		# Plots data and model with selected points
+		plt.plot(exp_time, model_selected, 'og', label='Model points selected')
+		plt.plot(exp_time, exp_viral_load, 'or', label="Experimental data")
+		plt.plot(model_time, model_viral_load, '-b', label="Results C++ model")
+		plt.title("Visualization of cost function")
+		plt.legend()
+		plt.savefig(utils.dir_images + "test.png", dpi=300)
+		# plt.show()
+		plt.clf()
 
 	# Calculates the cost of the model
 	try:
@@ -66,10 +67,12 @@ if __name__ == "__main__":
 	
 	patients = utils.reads_patients_names()
 	
-	for p in patients:
-			exp_time, exp_viral_load = utils.reads_experimental_data(p)
-			de_params = utils.reads_de_parameters(p)
+	# a = [0.3385309832600468,0.77419786432582s
 
-			cost = model_cost(de_params, exp_time, exp_viral_load) 
+	# for p in patients:
+	# 		exp_time, exp_viral_load = utils.reads_experimental_data(p)
+	# 		de_params = utils.reads_de_parameters(p)
 
-			print("Cost of patient " + p + " = " + str(cost) + "\n")
+	# 		cost = model_cost(de_params, exp_time, exp_viral_load, True) 
+
+	# 		print("Cost of patient " + p + " = " + str(cost) + "\n")
