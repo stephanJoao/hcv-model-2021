@@ -31,6 +31,15 @@ if __name__ == "__main__":
     if not os.path.isdir(dir_output):
         os.system("mkdir" + dir_output)
 
+    # Compiles model
+    print("========== Compiling C++ model===========")
+    directory = "hcv_model/"
+    os.system("make clean -C " + directory)
+    os.system("make -C " + directory)
+    os.system("make run -C " + directory)
+    print("=========================================")
+
+    # Header of experiment report
     output = open(dir_output + "report_DE.txt", "a")
     output.writelines("\n\n =========== Experiment ===========\n")
     output.writelines("\nPopulation size: " + str(pop_size))
@@ -38,9 +47,9 @@ if __name__ == "__main__":
     output.writelines("\nParameters: " + array_param + "\n")
     output.close()
 
-    pat_cont = 1
-    
+    # Reads
     patients = utils.reads_patients_names()
+    pat_cont = 1
 
     for p in patients:
         output = open(dir_output + "report_DE.txt", "a")
@@ -51,32 +60,19 @@ if __name__ == "__main__":
         
         # Diferential evolution with time 
         t_ini = time.perf_counter()
-        solution = differential_evolution(cost.model_cost, bounds, args=(exp_time, exp_viral_load, True), maxiter=max_iter, popsize=pop_size, mutation=mutate, recombination=recombination, tol=0.1)
+        solution = differential_evolution(cost.model_cost, bounds, args=(exp_time, exp_viral_load), maxiter=max_iter, popsize=pop_size, mutation=mutate, recombination=recombination, tol=0.1, workers=1)
         t_fin = time.perf_counter()
         
         output.writelines(f"Execution time: {t_fin - t_ini:0.4f} seconds")
         # output.writelines('\nCusto do melhor conjunto de parametros: ' + str(solution.fun) + '\n\n')
         output.writelines("\nSolution found: " + str(solution.x) + "\n\n")
-        
-        
-        # utils.plot_experiment_patient(p)
-        
-        # # Experimental plot
-        # plt.plot(t_exp[pat_cont-1], pat, 'ro')
-        # plt.title(str(pat_name[pat_cont-1]))
 
-        # plt.xlabel("dias")
-        # plt.ylabel("Carga viral $log_{10}$")
-        # plt.legend()
-        # # # Plot da solucao com os melhores parametros
-        # # cost_func(sol_pat.x, pat, (10**pat[0]), pat_cont-1, t_exp)
-        # # print('\nCusto do melhor conjunto de parametros: ' +
-        # #       str(sol_pat.fun) + '\n\n')
-        # # print('\nO melhor conjunto de parametros: '+str(sol_pat.x) + '\n\n')
-        # # plt.savefig("../figs/pat_"+str(pat_name[pat_cont-1])+"NGem_" +
-        # #             str(maxiter)+"NPop_"+str(popsize)+".png")
-
+        utils.plot_experiment_patient(p, solution.x)
+        
         pat_cont += 1
         break
     
+        #TODO Melhorar o print do report e fazer leitura de parametros - armazenamento - e salvamento/substituição pelo do experimento atual
+        
+
     output.close()

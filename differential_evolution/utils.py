@@ -18,6 +18,7 @@ dir_model_output = "hcv_model/output/solution.txt"
 # Directory where images will be saved
 dir_images = "differential_evolution/output/images/"
 
+
 def reads_patients_names():
 	"""
 	Gets patients names in a dataframe.
@@ -109,26 +110,28 @@ def plot_experiment_patient(patient, de_parameters = None):
 	Plots the solved model with the experimental data.
 	Arguments:
 		patient: a string that contains the name of the selected patient
+		de_parameters: plots the experiment with provided arbitrary parameters 
 	"""
 
-	# Reads all necessary data
+	# Reads the experimental data
 	exp_time, exp_viral_load = reads_experimental_data(patient)
-	if de_parameters == None:
+	if de_parameters is None:
 		de_params = reads_de_parameters(patient)
 	else:
 		de_params = de_parameters
 
-	# Writes parameters on file for model solver
+	# Gets parameters of the model
 	epsilon_r, epsilon_alpha, epsilon_s, alpha, r, delta, mu_c, rho, theta, sigma, c = de_params
 
+	# Writes parameters in input file of model
 	with open(dir_model_input, 'w') as params_file:
 		params_file.write(str(10**exp_viral_load[0]) + "," + str(epsilon_r) + "," + str(epsilon_alpha) + "," + str(epsilon_s) + "," + str(alpha) + "," + str(r) + "," + str(delta) + "," + str(mu_c) + "," + str(rho) + "," + str(theta) + "," + str(sigma) + "," + str(c))
 
 	# Execute the model with the parameters
 	print("=========== Running C++ model ===========")
 	directory = "hcv_model/"
-	os.system("make clean -C " + directory)
-	os.system("make -C " + directory)
+	# os.system("make clean -C " + directory)
+	# os.system("make -C " + directory)
 	os.system("make run -C " + directory)
 	print("=========================================")
 
@@ -146,19 +149,27 @@ def plot_experiment_patient(patient, de_parameters = None):
 	# plt.show()
 	plt.clf()
 
+
 if __name__ == "__main__":      
-	
+	"""
+	Creates directory and plots the experiments with parameters saved on the .csv
+	"""
+
 	# Creation of necessary directory
 	if not os.path.isdir(dir_images):
-		os.system("mkdir" + dir_images)	
+		os.system("mkdir " + dir_images)	
 
-	# #####* TESTE
-	# patients = patients_names(dir_exp_data)
-	# exp_viral_load, exp_time = experimental_viral_load(dir_exp_data, patients[2])
-	# print(viralmodelfit(de_parameters(dir_de_params, patients[2]), exp_viral_load, exp_time))
-	
-	# Program
+	# Compiles model
+	print("========== Compiling C++ model===========")
+	directory = "hcv_model/"
+	os.system("make clean -C " + directory)
+	os.system("make -C " + directory)
+	os.system("make run -C " + directory)
+	print("=========================================")
+
+	# Reads patients names
 	patients = reads_patients_names()
 
+	# Program
 	for p in patients:
 		plot_experiment_patient(p)
