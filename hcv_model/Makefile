@@ -20,7 +20,7 @@ OBJ = ${subst .cpp,.o,${subst source,objects,${CPP_SOURCE}}}
 CC = g++
 
 # Compiler flags
-CC_FLAGS = -c -W -Wall -ansi -pedantic
+CC_FLAGS = -c -W -Wall -ansi -pedantic -O3
 
 
 #* Compilation and linking
