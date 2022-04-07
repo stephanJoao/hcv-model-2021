@@ -58,29 +58,34 @@ def reads_experimental_data(patient):
 
 	return t, v
 
-def reads_de_parameters(patient):
+def reads_de_parameters(patient=None):
 	"""
 	Reads the differential evolution parameters of selected patient.
 	Arguments:
-		dir: a string that contains the directory and name of .csv that has the parameters
 		patient: a string that contains the name of the selected patient
 	Returns:
 		p: a list that contains the parameters
 	"""
 
 	df = pd.read_csv(dir_de_params)
+	
+	
+	if patient is not None:
+		patient_index = df.index[df["Patient"] == patient]
+		p = df.to_numpy()
+		p = p[patient_index].flatten()
+		p = np.delete(p, 0)
 
-	patient_index = df.index[df["Patient"] == patient]
-	p = df.to_numpy()
-	p = p[patient_index].flatten()
-	p = np.delete(p, 0)
+		# # Prints differential evolution parameters of selected patient
+		# print("Parameters of " + patient + ": ")
+		# print(p)
+		# print("\n")
 
-	# # Prints differential evolution parameters of selected patient
-	# print("Parameters of " + patient + ": ")
-	# print(p)
-	# print("\n")
+		return p
+	
+	else:
+		return df
 
-	return p
 
 def reads_model_data():
 	"""
@@ -105,7 +110,7 @@ def reads_model_data():
 
 	return t, v
 
-def plot_experiment_patient(patient, de_parameters = None):
+def plot_experiment_patient(patient, de_parameters=None):
 	"""
 	Plots the solved model with the experimental data.
 	Arguments:
@@ -148,6 +153,24 @@ def plot_experiment_patient(patient, de_parameters = None):
 	plt.savefig(dir_images + patient + ".png", dpi=300)
 	# plt.show()
 	plt.clf()
+
+def writes_de_parameters(patient, de_parameters):
+	"""
+	Plots the solved model with the experimental data.
+	Arguments:
+		patient: a string that contains the name of the selected patient
+		de_parameters: plots the experiment with provided arbitrary parameters 
+	"""
+
+	df = reads_de_parameters()
+
+	line = np.empty(0)
+	line = np.append(line, patient)
+	line = np.append(line, de_parameters)
+
+	df.loc[df.index[df['Patient'] == patient]] = line
+
+	df.to_csv(dir_de_params, index=False)
 
 
 if __name__ == "__main__":      

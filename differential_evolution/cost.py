@@ -5,7 +5,7 @@ from scipy.spatial import distance
 
 import utils
 
-def model_cost(de_params, exp_time, exp_viral_load, name = "test", plot = False, compile = False):
+def model_cost(de_params, exp_time, exp_viral_load, name="test", plot=False, compile=False):
 	"""
 	Calculates the cost of a model according to certain parameters.
 	Arguments:
