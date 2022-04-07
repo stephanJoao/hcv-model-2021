@@ -14,7 +14,7 @@ CPP_SOURCE = ${wildcard ./source/*.cpp}
 HPP_SOURCE = ${wildcard ./source/*.hpp}
 
 # Object files
-OBJ = ${subst .cpp,.o,${subst source,objects,${CPP_SOURCE}}}
+OBJ = ${subst .cpp,.o,${subst source,build,${CPP_SOURCE}}}
 
 # Compiler
 CC = g++
@@ -25,22 +25,22 @@ CC_FLAGS = -c -W -Wall -ansi -pedantic -O3
 
 #* Compilation and linking
 
-all: objectsFolder ${PROJ_NAME}
+all: buildFolder ${PROJ_NAME}
 
 ${PROJ_NAME}: ${OBJ}
 	@${CC} $^ -o $@
 
-./objects/%.o: ./source/%.cpp ./source/%.hpp
+./build/%.o: ./source/%.cpp ./source/%.hpp
 	@${CC} $< ${CC_FLAGS} -o $@
 
-./objects/main.o: ./source/main.cpp ${H_SOURCE}
+./build/main.o: ./source/main.cpp ${H_SOURCE}
 	@${CC} $< ${CC_FLAGS} -o $@
 
-objectsFolder:
-	@mkdir -p objects
+buildFolder:
+	@mkdir -p build
 
 clean:
-	@rm -rf ./objects/*.o
+	@rm -rf ./build/*.o
 
 run:
 	@./program
