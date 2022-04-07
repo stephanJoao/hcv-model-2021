@@ -5,7 +5,7 @@
 #* Variables
 
 # Name of the project
-PROJ_NAME = program
+PROJ_NAME = build/program
 
 # .cpp files
 CPP_SOURCE = ${wildcard ./source/*.cpp}
@@ -43,6 +43,6 @@ clean:
 	@rm -rf ./build/*.o
 
 run:
-	@./program
+	@./build/program
 
 .PHONY: all clean
